@@ -1,0 +1,35 @@
+#!/usr/bin/env perl
+
+# daterename script
+# pass it args of images with EXIF headers (jpg, dng, raw, etc)
+
+my $jtool="/opt/homebrew/bin/exiftool";
+my $dorename=0; #flag to do the rename or just print out shell commands
+
+die unless ( -x $jtool );
+
+while ($x = shift) {
+    my $field;
+    if ($x =~/(.SRW|.dng)$/i) {
+	$field='-DateTimeOriginal';
+    } else {
+	$field='-CreateDate';
+    }
+
+    my $cmd="$jtool $field $x";
+    open (JTOOL, "$cmd |");
+    while (<JTOOL>) {
+
+	my ($yy,$mon,$dd,$hh,$min,$sec) = ($_ =~ /(\d\d\d\d):(\d\d):(\d\d) (\d\d):(\d\d):(\d\d)/);
+	my $datetime=sprintf ("%2.2d%2.2d%2.2d_%2.2d%2.2d%2.2d", $yy,$mon,$dd,$hh,$min,$sec);
+	my $targetname="${datetime}_${x}";
+
+	if ($dorename) {
+	    rename "$x", "${targetname}";
+	    next; #not really necessary as $cmd should only output one line
+	} else {
+	    print "mv $x $targetname\n";
+	    next;
+	}
+    }
+}
