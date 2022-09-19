@@ -21,14 +21,14 @@ while ($x = shift) {
     while (<JTOOL>) {
 
 	my ($yy,$mon,$dd,$hh,$min,$sec) = ($_ =~ /(\d\d\d\d):(\d\d):(\d\d) (\d\d):(\d\d):(\d\d)/);
-	my $datetime=sprintf ("%2.2d%2.2d%2.2d_%2.2d%2.2d%2.2d", $yy,$mon,$dd,$hh,$min,$sec);
+	my $datetime=sprintf ("%4.4d%2.2d%2.2d_%2.2d%2.2d%2.2d", $yy,$mon,$dd,$hh,$min,$sec);
 	my $targetname="${datetime}_${x}";
 
 	if ($dorename) {
 	    rename "$x", "${targetname}";
 	    next; #not really necessary as $cmd should only output one line
 	} else {
-	    print "mv $x $targetname\n";
+	    print qq(mv "$x" "$targetname"\n);
 	    next;
 	}
     }
